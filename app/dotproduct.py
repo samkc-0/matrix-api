@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from random import choice
+import numpy as np
 
 
 class KeySequence(BaseModel):
@@ -57,10 +58,10 @@ def no_such_omission_already(omissions: list[Omission], omission: Omission):
     return True
 
 
-def create_mutltiplication_problem(
+def create_multiplication_problem(
     a, b, c, num_omissions, can_omit_from=["a", "b", "c"]
 ):
-    assert c == a @ b, f"{c} != {a} @ {b}"
+    assert np.array_equal(c, a @ b), f"{c} != {a} @ {b}? bad inner product attempt"
     res = MultiplicationResponse(a=a, b=b, c=c, omissions=[])
     omissions = []
     tries = 0

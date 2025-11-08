@@ -1,5 +1,4 @@
 from fastapi import status
-from fastapi.testclient import TestClient
 import numpy as np
 import pytest
 
@@ -8,7 +7,7 @@ from app.dotproduct import (
     generate_key_presses,
     choose_cell,
     validate_omission,
-    create_mutltiplication_problem,
+    create_multiplication_problem,
 )
 
 
@@ -47,6 +46,23 @@ def test_choose_cell(two_by_two):
 
 def test_create_mutltiplication_problem(two_by_two):
     a, b, c = two_by_two
-    res = create_mutltiplication_problem(a, b, c, 2)
+    res = create_multiplication_problem(a, b, c, 2)
     assert len(res.omissions) == 2
     assert np.array(res.a) @ np.array(res.b) == np.array(res.c)
+    # TODO: check that the omissions are valid and can generate key sequences
+
+
+def test_dotproduct_request(client):
+    res = client.post(
+        "/dotproduct",
+        json={
+            "outer_dim_a": 2,
+            "inner_dim": 2,
+            "outer_dim_b": 2,
+            "num_omissions": 2,
+            "can_omit_from": ["a", "b", "c"],
+        },
+    )
+    data = res.json()
+    print(data)
+    assert res.status_code == status.HTTP_200_OK
