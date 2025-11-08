@@ -8,6 +8,6 @@ def index():
     return {"message": "Hello from FastAPI"}
 
 
-@app.get("/api/breathing")
+@app.get("/breathing")
 def breathing():
     return {"message": "I'm OK. Thanks for checking 🥰"}

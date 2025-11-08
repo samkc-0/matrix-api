@@ -1,40 +1,14 @@
-ARG UV_TAG=0.9.8-python3.12-bookworm-slim
-# builder
-FROM ghcr.io/astral-sh/uv:${UV_TAG} AS builder
-LABEL org.opencontainers.image.title="fastapi microservice" \
-      org.opencontainers.image.description="fast api microservice boilerplate" \
-      org.opencontainers.image.source="https://github.com/samkc-0/fastapi-microservice" \
-      org.opencontainers.image.version="1.0.0" 
-WORKDIR /srv
-COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
-COPY app/ /srv/
+FROM python:3.12-slim
 
-# dev image with tools, shell, hot reload
-FROM ghcr.io/astral-sh/uv:${UV_TAG} AS dev
-WORKDIR /srv
-COPY --from=builder /srv /srv
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl less procps \
-    && rm -rf /var/lib/apt/lists/* \
-    && uv sync --frozen --group dev
-ENV PYTHONUNBUFFERED=1
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Install uv.
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# prod image with minimal runtime
-FROM gcr.io/distroless/base-debian12 AS prod
-WORKDIR /srv
-USER 65532:65532
-COPY --from=builder /srv /srv
-ENV PYTHONUNBUFFERED=1 PYTHONOPTIMIZE=1 PYTHONPYCACHEPREFIX=/tmp
-EXPOSE 8000
-ENTRYPOINT ["/srv/.venv/bin/python","-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copy the application into the container.
+COPY . /app
 
-# testing
-FROM ghcr.io/astral-sh/uv:${UV_TAG} AS test
-WORKDIR /srv
-COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --group dev
-COPY app/ /srv/app/
-COPY tests/ /srv/tests/
-RUN uv run pytest -q
+# Install the application dependencies.
+WORKDIR /app
+RUN uv sync --frozen --no-cache
+
+# Run the application.
+CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "80", "--host", "0.0.0.0"]
