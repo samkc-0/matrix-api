@@ -4,3 +4,7 @@ services:
     build: .
     ports:
       - "8000:8000"
+  caddy:
+    image: caddy:2
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
