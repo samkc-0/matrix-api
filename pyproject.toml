@@ -15,4 +15,10 @@ serve = "uvicorn:main"
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
+    "pytest-asyncio",
+    "httpx",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

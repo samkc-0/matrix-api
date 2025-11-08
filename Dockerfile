@@ -29,3 +29,12 @@ COPY --from=builder /srv /srv
 ENV PYTHONUNBUFFERED=1 PYTHONOPTIMIZE=1 PYTHONPYCACHEPREFIX=/tmp
 EXPOSE 8000
 ENTRYPOINT ["/srv/.venv/bin/uvicorn","app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# testing
+FROM ghcr.io/astral-sh/uv:${UV_TAG} AS test
+WORKDIR /srv
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --group dev
+COPY app/ /srv/app/
+COPY tests/ /srv/tests/
+RUN uv run pytest -q
