@@ -28,7 +28,7 @@ USER 65532:65532
 COPY --from=builder /srv /srv
 ENV PYTHONUNBUFFERED=1 PYTHONOPTIMIZE=1 PYTHONPYCACHEPREFIX=/tmp
 EXPOSE 8000
-ENTRYPOINT ["/srv/.venv/bin/uvicorn","app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/srv/.venv/bin/python","-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # testing
 FROM ghcr.io/astral-sh/uv:${UV_TAG} AS test
