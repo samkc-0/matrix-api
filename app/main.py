@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status, HTTPException
+import numpy as np
 
 app = FastAPI()
 
@@ -11,3 +12,8 @@ def index():
 @app.get("/breathing")
 def breathing():
     return {"message": "I'm OK. Thanks for checking 🥰"}
+
+
+@app.post("/dotproduct")
+def dotproduct():
+    return {"message": "not implemented"}
