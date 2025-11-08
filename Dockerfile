@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && uv sync --frozen --group dev
 ENV PYTHONUNBUFFERED=1
-CMD ["uv", "run", "python", "-m", "main"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # prod image with minimal runtime
 FROM gcr.io/distroless/base-debian12 AS prod
@@ -27,4 +27,5 @@ WORKDIR /srv
 USER 65532:65532
 COPY --from=builder /srv /srv
 ENV PYTHONUNBUFFERED=1 PYTHONOPTIMIZE=1 PYTHONPYCACHEPREFIX=/tmp
-ENTRYPOINT ["/srv/.venv/bin/python","-m","main"]
+EXPOSE 8000
+ENTRYPOINT ["/srv/.venv/bin/uvicorn","app.main:app", "--host", "0.0.0.0", "--port", "8000"]
