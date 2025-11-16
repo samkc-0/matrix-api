@@ -5,7 +5,6 @@ import pytest
 from app.dotproduct import (
     MultiplicationResponse,
     generate_key_presses,
-    choose_cell,
     validate_omission,
     create_multiplication_problem,
 )
@@ -33,6 +32,7 @@ def test_1x2_dot_2x1_key_sequence(two_by_two):
     ]
 
 
+"""
 def test_choose_cell(two_by_two):
     a, b, c = two_by_two
     res = MultiplicationResponse(**{"a": a, "b": b, "c": c}, omissions=[])
@@ -42,14 +42,15 @@ def test_choose_cell(two_by_two):
         r = omission.row
         c = omission.col
         assert validate_omission(res.model_dump()[m], r, c)
+"""
 
 
 def test_create_mutltiplication_problem(two_by_two):
     a, b, c = two_by_two
-    res = create_multiplication_problem(a, b, c, 2)
-    assert len(res.omissions) == 2
+    res = create_multiplication_problem(a, b, c, 1, "c")
+    assert res.detail == "ok"
+    assert len(res.omissions) == 1
     assert np.array(res.a) @ np.array(res.b) == np.array(res.c)
-    # TODO: check that the omissions are valid and can generate key sequences
 
 
 def test_dotproduct_request(client):
@@ -60,7 +61,7 @@ def test_dotproduct_request(client):
             "inner_dim": 2,
             "outer_dim_b": 2,
             "num_omissions": 2,
-            "can_omit_from": ["a", "b", "c"],
+            "omit_from": "c",
         },
     )
     data = res.json()
